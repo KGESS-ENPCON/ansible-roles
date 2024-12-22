@@ -22,12 +22,15 @@ GRANT CREATE ON SCHEMA public TO netbox;
 \q
 EOF
 
+echo 'Make sure the postgresql server is only listening on localhost'
+
 # Redis
 sudo apt install -y redis-server
 redis-server -v
 echo 'You may wish to modify the Redis configuration at /etc/redis.conf or /etc/redis/redis.conf however in most cases the default configuration is sufficient'
 
 redis-cli ping
+echo 'Make sure the redis server is only listening on localhost'
 
 
 # Netbox
