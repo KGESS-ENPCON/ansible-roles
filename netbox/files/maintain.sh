@@ -5,7 +5,8 @@
 # sudo chmod a+x /etc/cron.daily/netbox-maintain.sh
 
 sudo apt update
-sudo -u postgres pg_dump -C -f /opt/netbox-backup/pgdump.sql netbox
+PGBACKUPDATETIME=$(date --utc +"%Y-%m-%d-%H%M%S")
+sudo -u postgres pg_dump -C -f /opt/netbox-backup/pgdump-$PGBACKUPDATETIME.sql netbox
 cd /opt/netbox/
 sudo git pull
 sudo apt full-upgrade -y
