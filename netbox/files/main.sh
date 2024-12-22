@@ -11,7 +11,7 @@ sudo apt update
 sudo apt install -y postgresql
 psql -V
 
-sudo -u postgres psql
+sudo -u postgres psql <<'EOF'
 
 CREATE DATABASE netbox;
 CREATE USER netbox WITH PASSWORD '$DBPASSWORD';
@@ -20,7 +20,7 @@ ALTER DATABASE netbox OWNER TO netbox;
 \connect netbox;
 GRANT CREATE ON SCHEMA public TO netbox;
 \q
-
+EOF
 
 # Redis
 sudo apt install -y redis-server
@@ -47,11 +47,12 @@ sudo chown --recursive netbox /opt/netbox/netbox/scripts/
 cd /opt/netbox/netbox/netbox/
 sudo cp configuration_example.py configuration.py
 
-python3 ../generate_secret_key.py
-vim configuration.py
+SECRETKEYNETBOX=$(python3 ../generate_secret_key.py)
+sudo vim configuration.py
 
 sudo /opt/netbox/upgrade.sh
 
+# Create Admin user
 source /opt/netbox/venv/bin/activate
 cd /opt/netbox/netbox
 python3 manage.py createsuperuser
@@ -64,7 +65,6 @@ sudo cp /opt/netbox/contrib/gunicorn.py /opt/netbox/gunicorn.py
 sudo cp -v /opt/netbox/contrib/*.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now netbox netbox-rq
-systemctl status netbox.service
 
 # HTTP server
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -76,5 +76,3 @@ sudo cp /opt/netbox/contrib/nginx.conf /etc/nginx/sites-available/netbox
 sudo rm /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
 sudo systemctl restart nginx
-
-
