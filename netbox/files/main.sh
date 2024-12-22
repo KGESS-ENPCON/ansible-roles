@@ -79,3 +79,6 @@ sudo cp /opt/netbox/contrib/nginx.conf /etc/nginx/sites-available/netbox
 sudo rm /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/netbox /etc/nginx/sites-enabled/netbox
 sudo systemctl restart nginx
+
+sudo mkdir /opt/netbox-backup
+sudo chown postgres:postgres /opt/netbox-backup
