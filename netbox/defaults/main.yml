@@ -1,2 +1,4 @@
 ---
 ANSIBLEFQDN: "netbox.kges2.net"
+NETBOXSECRETKEY: ""
+DBPASSWORD: ""
