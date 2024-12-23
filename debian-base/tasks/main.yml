@@ -14,7 +14,7 @@
 
 - name: Set Repo Pin Prio for Debian unstable
   ansible.builtin.file:
-    src: 90-unstable.pref
+    src: files/90-unstable.pref
     dest: /etc/apt/preferences.d/90-unstable
     owner: root
     group: root
