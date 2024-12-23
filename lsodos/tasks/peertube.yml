@@ -72,5 +72,11 @@ sudo systemctl enable peertube
 sudo systemctl start peertube
 
 
+## Install peertube-cli
+node --version # Should be >= 16.x
+sudo npm install -g @peertube/peertube-cli
+peertube-cli auth add -u 'PEERTUBE_URL' -U 'PEERTUBE_USER' --password 'PEERTUBE_PASSWORD'
+peertube-cli upload <videoFile>
+
 ...
   
