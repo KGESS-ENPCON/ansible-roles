@@ -12,6 +12,15 @@
     repo: deb https://deb.debian.org/debian unstable main contrib non-free
     state: "{{ DEBUNSTABLEREPO }}"
 
+- name: Set Repo Pin Prio for Debian unstable
+  ansible.builtin.file:
+    src: 90-unstable.pref
+    dest: /etc/apt/preferences.d/90-unstable
+    owner: root
+    group: root
+    mode: 0644
+  when: DEBUNSTABLEREPO = "present"
+  
 - name: Update apt sources
   ansible.builtin.apt:
     name: "*"
