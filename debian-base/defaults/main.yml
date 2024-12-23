@@ -7,4 +7,5 @@ ADMINCONTACTMAIL: "example-at-example"
 ADMINCONTACTWEB: ""
 ADMINCONTACTPHONE: ""
 
-DEBUNSTABLEREPO: "enabled"
+# present or absent
+DEBUNSTABLEREPO: "present"
