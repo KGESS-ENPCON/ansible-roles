@@ -1,0 +1,13 @@
+ENPCON large-scale open data operating system (ELSODOS)
+
+
+Greetings
+You are using the ENPCON large-scale open data operating system (ELSODOS).
+This system is managed via Ansible. For permanent changes, edit the 
+appropriate Ansible files.
+
+Possibly you are able to execute commands on this system as the local
+systemadministrator.
+
+Your networkadministrator and non-local systemadministrator:
+ENPCON
