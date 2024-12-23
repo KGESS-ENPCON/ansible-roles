@@ -7,6 +7,11 @@
     group: root
     mode: 0644
 
+- name: Add Debian unstable repo to apt sources
+  ansible.builtin.apt_repository:
+    repo: deb https://deb.debian.org/debian unstable main contrib non-free
+    state: "{{ DEBUNSTABLEREPO }}"
+
 - name: Update apt sources
   ansible.builtin.apt:
     name: "*"
@@ -16,6 +21,7 @@
 - name: Upgrade the OS
   ansible.builtin.apt:
     upgrade: dist
+    update_cache: yes
 
 - name: Reboot machine and send message
   ansible.builtin.reboot:
