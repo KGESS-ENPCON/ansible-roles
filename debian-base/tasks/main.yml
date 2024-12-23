@@ -1,2 +1,25 @@
 ---
-- name: Update all packages to their latest version
+- name: Define MOTD
+  ansible.builtin.template:
+    src: motd.txt.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Update apt sources
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: Upgrade the OS
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Reboot machine and send message
+  ansible.builtin.reboot:
+    msg: "Rebooting host"
+
+...
+  
