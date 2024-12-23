@@ -24,9 +24,11 @@
       - cron
     state: latest
     update_cache: yes
+  become: true
 
 - name: Install yarn
-  ansible.builtin.command:
+  ansible.builtin.command: "npm install --global yarn"
+  become: true
 
 ...
   
