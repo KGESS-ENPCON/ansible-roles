@@ -1,23 +1,9 @@
+---
+ENCRYPTSTATUS: "disabled"
+MAXALLOWEDDATALEVEL: "A1 - PUBLIC"
+ADMINCONTACTENTITY: "ENPCON"
+ADMINCONTACTDEP: "CCC"
+ADMINCONTACTMAIL: "example-at-example"
+ADMINCONTACTWEB: ""
+ADMINCONTACTPHONE: ""
 
-{{ ansible_inventory }}
-
-Encryption of this Host: {{ ENCRYPTSTATUS }}
-Data classified as {{ MAXALLOWEDDATALEVEL }} is allowed on this system
-
-###################################################################
-This system is managed via Ansible. For permanent changes, edit the 
-appropriate Ansible files.
-
-Possibly you are able to execute commands on this system as the local
-systemadministrator.
-###################################################################
-
--------------------------------------------------------------------
-Networkadministrator and non-local systemadministrator:
-{{ ADMINCONTACTENTITY }}
-{{ ADMINCONTACTDEP }}
-
-{{ ADMINCONTACTMAIL }}
-{{ ADMINCONTACTWEB }}
-{{ ADMINCONTACTPHONE }}
--------------------------------------------------------------------
