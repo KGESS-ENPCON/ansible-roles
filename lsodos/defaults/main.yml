@@ -2,3 +2,4 @@
 PUBLICCERT: "selfsigned"
 PEERTUBEUSERPASS: ""
 PEERTUBEDBPASS: ""
+PEERTUBEOPSEC: "openssl rand -hex 32"

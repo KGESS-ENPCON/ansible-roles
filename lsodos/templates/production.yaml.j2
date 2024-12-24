@@ -11,7 +11,7 @@ webserver:
 # Secrets you need to generate the first time you run PeerTube
 secrets:
   # Generate one using `openssl rand -hex 32`
-  peertube: ''
+  peertube: '{{ PEERTUBEOPSEC }}'
 
 rates_limit:
   api:
@@ -78,7 +78,7 @@ database:
   ssl: false
   suffix: '_prod'
   username: 'peertube'
-  password: 'peertube'
+  password: '{{ PEERTUBEDBPASS }}'
   pool:
     max: 5
 
