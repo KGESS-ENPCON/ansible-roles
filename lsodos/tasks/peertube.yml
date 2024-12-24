@@ -56,7 +56,7 @@
 # ls -ld /var/www/peertube # Should be drwxr-xr-x
 
 - name: Create Postgres DB User
-  ansible.builtin.command: "createuser -P peertube # password interactive"
+  ansible.builtin.command: "psql -c "CREATE USER peertube with password '{{ PEERTUBEDBPASS }}';"
   become_user: postgres
   become: true
 
@@ -112,33 +112,75 @@
   ansible.builtin.command: 'cd /var/www/peertube/peertube-latest && sudo -H -u peertube yarn install --production --pure-lockfile'
   become: true
 
-# cd /var/www/peertube
-
 - name: Copy PeerTube configfiles
-  ansible.builtin.command: 'cp peertube-latest/config/default.yaml config/default.yaml'
+  ansible.builtin.command: 'cp /var/www/peertube/peertube-latest/config/default.yaml /var/www/peertube/config/default.yaml'
   become_user: peertube
   become: true
-
-# cd /var/www/peertube
 
 - name: Copy PeerTube configfiles II
-  ansible.builtin.command: 'cp peertube-latest/config/production.yaml.example config/production.yaml'
-  become_user: peertube
+  ansible.builtin.template:
+    src: production.yaml.j2
+    dest: /var/www/peertube/config/production.yaml
+    owner: peertube
+    group: peertube
+    mode: 0644
   become: true
 
-echo 'Now edit config/production.yaml and set webserver, secrets, database-password for postgres, redis, smtp, admin.email'
-sudo cp /var/www/peertube/peertube-latest/support/nginx/peertube /etc/nginx/sites-available/peertube
-sudo PEERTUBEDOMAIN=tv.enpcon
-sudo sed -i 's/${WEBSERVER_HOST}/$PEERTUBEDOMAIN/g' /etc/nginx/sites-available/peertube
-sudo sed -i 's/${PEERTUBE_HOST}/127.0.0.1:9000/g' /etc/nginx/sites-available/peertube
-sudo ln -s /etc/nginx/sites-available/peertube /etc/nginx/sites-enabled/peertube
-sudo systemctl stop nginx
-sudo certbot certonly --standalone --post-hook "systemctl restart nginx" # interactive
-sudo systemctl restart nginx
-sudo cp /var/www/peertube/peertube-latest/support/sysctl.d/30-peertube-tcp.conf /etc/sysctl.d/
-sudo sysctl -p /etc/sysctl.d/30-peertube-tcp.conf
-sudo cp /var/www/peertube/peertube-latest/support/systemd/peertube.service /etc/systemd/system/
-sudo systemctl daemon-reload
+- name: Copy nginx config I
+  ansible.builtin.command: 'cp /var/www/peertube/peertube-latest/support/nginx/peertube /etc/nginx/sites-available/peertube'
+  become: true
+
+- name: Copy nginx config II
+  ansible.builtin.command: "sed -i 's/${WEBSERVER_HOST}/{{ ansible_inventory }}/g' /etc/nginx/sites-available/peertube"
+  become: true
+
+- name: Copy nginx config III
+  ansible.builtin.command: "sed -i 's/${PEERTUBE_HOST}/127.0.0.1:9000/g' /etc/nginx/sites-available/peertube"
+  become: true
+
+- name: Create nginx symlink
+  ansible.builtin.command: "ln -s /etc/nginx/sites-available/peertube /etc/nginx/sites-enabled/peertube"
+  become: true
+
+- name: Stop nginx
+  ansible.builtin.systemd_service:
+    name: nginx
+    state: stopped
+  become: true
+
+- name: Create certbot cert
+  ansible.builtin.command: "certbot certonly --standalone # interactive"
+  become: true
+  when: PUBLICCERT = "certbot"
+
+- name: Create selfsigned cert
+  ansible.builtin.command: "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/letsencrypt/live/{{ ansible_inventory }}/privkey.pem -out /etc/letsencrypt/live/{{ ansible_inventory }}/fullchain.pem -subj "/C=CH/ST=Zurich/L=Zurich/O=ENPCON/OU=CCC/CN={{ ansible_inventory }}"
+  become: true
+  when: PUBLICCERT = "selfsigned"
+
+- name: Restart nginx
+  ansible.builtin.systemd_service:
+    name: nginx
+    state: restarted
+    enabled: true
+  become: true
+
+- name: Copy sysctl file
+  ansible.builtin.command: "cp /var/www/peertube/peertube-latest/support/sysctl.d/30-peertube-tcp.conf /etc/sysctl.d/"
+  become: true
+
+- name: Apply sysctl file
+  ansible.builtin.command: "sysctl -p /etc/sysctl.d/30-peertube-tcp.conf"
+  become: true
+
+- name: Copy systemd unitfile
+  ansible.builtin.command: "cp /var/www/peertube/peertube-latest/support/systemd/peertube.service /etc/systemd/system/"
+  become: true
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
 
 - name: Start PeerTube
   ansible.builtin.systemd_service:
