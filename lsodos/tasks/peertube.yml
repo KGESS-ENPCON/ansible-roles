@@ -50,7 +50,7 @@
     home: /var/www/peertube
     create_home: true
     shell: /bin/bash
-    password: {{ PEERTUBEUSERPASS }}
+    password: "{{ PEERTUBEUSERPASS }}"
   become: true
 
 # ls -ld /var/www/peertube # Should be drwxr-xr-x
