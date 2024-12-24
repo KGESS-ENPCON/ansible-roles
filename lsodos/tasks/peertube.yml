@@ -52,28 +52,80 @@
     shell: /bin/bash
     password: {{ PEERTUBEUSERPASS }}
   become: true
-    
 
-ls -ld /var/www/peertube # Should be drwxr-xr-x
-cd /var/www/peertube
-sudo -u postgres createuser -P peertube # password interactive
-sudo -u postgres createdb -O peertube -E UTF8 -T template0 peertube_prod
-sudo -u postgres psql -c "CREATE EXTENSION pg_trgm;" peertube_prod
-sudo -u postgres psql -c "CREATE EXTENSION unaccent;" peertube_prod
-VERSION=$(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4) && echo "Latest Peertube version is $VERSION"
-cd /var/www/peertube
-sudo -u peertube mkdir config storage versions
-sudo -u peertube chmod 750 config/
-cd /var/www/peertube/versions
-sudo -u peertube wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/${VERSION}/peertube-${VERSION}.zip"
-sudo -u peertube unzip -q peertube-${VERSION}.zip && sudo -u peertube rm peertube-${VERSION}.zip
-cd /var/www/peertube
-sudo -u peertube ln -s versions/peertube-${VERSION} ./peertube-latest
-cd ./peertube-latest && sudo -H -u peertube yarn install --production --pure-lockfile
-cd /var/www/peertube
-sudo -u peertube cp peertube-latest/config/default.yaml config/default.yaml
-cd /var/www/peertube
-sudo -u peertube cp peertube-latest/config/production.yaml.example config/production.yaml
+# ls -ld /var/www/peertube # Should be drwxr-xr-x
+
+- name: Create Postgres DB User
+  ansible.builtin.command: "createuser -P peertube # password interactive"
+  become_user: postgres
+  become: true
+
+- name: Create Postgres DB
+  ansible.builtin.command: "createdb -O peertube -E UTF8 -T template0 peertube_prod"
+  become_user: postgres
+  become: true
+
+- name: Edit DB parameters
+  ansible.builtin.command: 'psql -c "CREATE EXTENSION pg_trgm;" peertube_prod && psql -c "CREATE EXTENSION unaccent;" peertube_prod'
+  become_user: postgres
+  become: true
+
+- name: Get PeerTube Version
+  ansible.builtin.command: 'VERSION=$(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4) && echo "Latest Peertube version is $VERSION"'
+  become: true
+
+- name: Create dirs
+  ansible.builtin.file:
+    path: "{{ item.src }}"
+    state: directory
+  become: true
+  become_user: peertube
+  loop:
+    - { src: /var/www/peertube/config }
+    - { src: /var/www/peertube/storage }
+    - { src: /var/www/peertube/versions}
+
+- name: Set permissions for config directory
+  ansible.builtin.file:
+    path: /var/www/peertube/config
+    state: directory
+    mode: 0750
+  become: true
+  become_user: peertube
+
+- name: Get PeerTube
+  ansible.builtin.command: 'cd /var/www/peertube/versions && wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/${VERSION}/peertube-${VERSION}.zip"'
+  become_user: peertube
+  become: true
+
+- name: Unzip PeerTube
+  ansible.builtin.command: 'cd /var/www/peertube/versions && unzip -q peertube-${VERSION}.zip && rm peertube-${VERSION}.zip'
+  become_user: peertube
+  become: true
+
+- name: Create symlink
+  ansible.builtin.command: 'cd /var/www/peertube && ln -s versions/peertube-${VERSION} ./peertube-latest'
+  become_user: peertube
+  become: true
+
+- name: Install via yarn
+  ansible.builtin.command: 'cd /var/www/peertube/peertube-latest && sudo -H -u peertube yarn install --production --pure-lockfile'
+  become: true
+
+# cd /var/www/peertube
+
+- name: Copy PeerTube configfiles
+  ansible.builtin.command: 'cp peertube-latest/config/default.yaml config/default.yaml'
+  become_user: peertube
+  become: true
+
+# cd /var/www/peertube
+
+- name: Copy PeerTube configfiles II
+  ansible.builtin.command: 'cp peertube-latest/config/production.yaml.example config/production.yaml'
+  become_user: peertube
+  become: true
+
 echo 'Now edit config/production.yaml and set webserver, secrets, database-password for postgres, redis, smtp, admin.email'
 sudo cp /var/www/peertube/peertube-latest/support/nginx/peertube /etc/nginx/sites-available/peertube
 sudo PEERTUBEDOMAIN=tv.enpcon

@@ -2,3 +2,5 @@
 galaxy_info:
   author: ENPCON
   description: ENPCON large-scale open data operating system (ELSODOS)
+  license: GPL
+  min_ansible_version: 2.14.16
