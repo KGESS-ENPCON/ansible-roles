@@ -66,12 +66,17 @@
   become: true
 
 - name: Edit DB parameters
-  ansible.builtin.command: psql -c "CREATE EXTENSION pg_trgm;" peertube_prod && psql -c "CREATE EXTENSION unaccent;" peertube_prod
+  ansible.builtin.command: psql -c "CREATE EXTENSION pg_trgm;" peertube_prod 
+  become_user: postgres
+  become: true
+
+- name: Edit DB parameters II
+  ansible.builtin.command: psql -c "CREATE EXTENSION unaccent;" peertube_prod
   become_user: postgres
   become: true
 
 - name: Get PeerTube Version
-  ansible.builtin.command: VERSION=$(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4) && echo "Latest Peertube version is $VERSION"
+  ansible.builtin.command: echo "Latest Peertube version is $(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4)"
   become: true
 
 - name: Create dirs
