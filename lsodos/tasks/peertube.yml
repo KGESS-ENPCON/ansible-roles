@@ -27,7 +27,7 @@
   become: true
 
 - name: Install yarn
-  ansible.builtin.command: "npm install --global yarn"
+  ansible.builtin.command: npm install --global yarn
   become: true
 
 - name: Start Redis
@@ -56,17 +56,17 @@
 # ls -ld /var/www/peertube # Should be drwxr-xr-x
 
 - name: Create Postgres DB User
-  ansible.builtin.command: psql -c "CREATE USER peertube with password "{{ PEERTUBEDBPASS }}";"
+  ansible.builtin.command: psql -c "CREATE USER peertube with password '{{ PEERTUBEDBPASS }}';"
   become_user: postgres
   become: true
 
 - name: Create Postgres DB
-  ansible.builtin.command: "createdb -O peertube -E UTF8 -T template0 peertube_prod"
+  ansible.builtin.command: createdb -O peertube -E UTF8 -T template0 peertube_prod
   become_user: postgres
   become: true
 
 - name: Edit DB parameters
-  ansible.builtin.command: 'psql -c "CREATE EXTENSION pg_trgm;" peertube_prod && psql -c "CREATE EXTENSION unaccent;" peertube_prod'
+  ansible.builtin.command: psql -c "CREATE EXTENSION pg_trgm;" peertube_prod && psql -c "CREATE EXTENSION unaccent;" peertube_prod
   become_user: postgres
   become: true
 
@@ -94,26 +94,26 @@
   become_user: peertube
 
 - name: Get PeerTube
-  ansible.builtin.command: 'cd /var/www/peertube/versions && wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/${VERSION}/peertube-${VERSION}.zip"'
+  ansible.builtin.command: cd /var/www/peertube/versions && wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/${VERSION}/peertube-${VERSION}.zip"
   become_user: peertube
   become: true
 
 - name: Unzip PeerTube
-  ansible.builtin.command: 'cd /var/www/peertube/versions && unzip -q peertube-${VERSION}.zip && rm peertube-${VERSION}.zip'
+  ansible.builtin.command: cd /var/www/peertube/versions && unzip -q peertube-${VERSION}.zip && rm peertube-${VERSION}.zip
   become_user: peertube
   become: true
 
 - name: Create symlink
-  ansible.builtin.command: 'cd /var/www/peertube && ln -s versions/peertube-${VERSION} ./peertube-latest'
+  ansible.builtin.command: cd /var/www/peertube && ln -s versions/peertube-${VERSION} ./peertube-latest
   become_user: peertube
   become: true
 
 - name: Install via yarn
-  ansible.builtin.command: 'cd /var/www/peertube/peertube-latest && sudo -H -u peertube yarn install --production --pure-lockfile'
+  ansible.builtin.command: cd /var/www/peertube/peertube-latest && sudo -H -u peertube yarn install --production --pure-lockfile
   become: true
 
 - name: Copy PeerTube configfiles
-  ansible.builtin.command: 'cp /var/www/peertube/peertube-latest/config/default.yaml /var/www/peertube/config/default.yaml'
+  ansible.builtin.command: cp /var/www/peertube/peertube-latest/config/default.yaml /var/www/peertube/config/default.yaml
   become_user: peertube
   become: true
 
@@ -127,19 +127,19 @@
   become: true
 
 - name: Copy nginx config I
-  ansible.builtin.command: 'cp /var/www/peertube/peertube-latest/support/nginx/peertube /etc/nginx/sites-available/peertube'
+  ansible.builtin.command: cp /var/www/peertube/peertube-latest/support/nginx/peertube /etc/nginx/sites-available/peertube
   become: true
 
 - name: Copy nginx config II
-  ansible.builtin.command: "sed -i 's/${WEBSERVER_HOST}/{{ ansible_inventory }}/g' /etc/nginx/sites-available/peertube"
+  ansible.builtin.command: sed -i 's/${WEBSERVER_HOST}/{{ ansible_inventory }}/g' /etc/nginx/sites-available/peertube
   become: true
 
 - name: Copy nginx config III
-  ansible.builtin.command: "sed -i 's/${PEERTUBE_HOST}/127.0.0.1:9000/g' /etc/nginx/sites-available/peertube"
+  ansible.builtin.command: sed -i 's/${PEERTUBE_HOST}/127.0.0.1:9000/g' /etc/nginx/sites-available/peertube
   become: true
 
 - name: Create nginx symlink
-  ansible.builtin.command: "ln -s /etc/nginx/sites-available/peertube /etc/nginx/sites-enabled/peertube"
+  ansible.builtin.command: ln -s /etc/nginx/sites-available/peertube /etc/nginx/sites-enabled/peertube
   become: true
 
 - name: Stop nginx
@@ -149,7 +149,7 @@
   become: true
 
 - name: Create certbot cert
-  ansible.builtin.command: "certbot certonly --standalone # interactive"
+  ansible.builtin.command: certbot certonly --standalone
   become: true
   when: PUBLICCERT = "certbot"
 
@@ -166,15 +166,15 @@
   become: true
 
 - name: Copy sysctl file
-  ansible.builtin.command: "cp /var/www/peertube/peertube-latest/support/sysctl.d/30-peertube-tcp.conf /etc/sysctl.d/"
+  ansible.builtin.command: cp /var/www/peertube/peertube-latest/support/sysctl.d/30-peertube-tcp.conf /etc/sysctl.d/
   become: true
 
 - name: Apply sysctl file
-  ansible.builtin.command: "sysctl -p /etc/sysctl.d/30-peertube-tcp.conf"
+  ansible.builtin.command: sysctl -p /etc/sysctl.d/30-peertube-tcp.conf
   become: true
 
 - name: Copy systemd unitfile
-  ansible.builtin.command: "cp /var/www/peertube/peertube-latest/support/systemd/peertube.service /etc/systemd/system/"
+  ansible.builtin.command: cp /var/www/peertube/peertube-latest/support/systemd/peertube.service /etc/systemd/system/
   become: true
 
 - name: Reload systemd daemon
