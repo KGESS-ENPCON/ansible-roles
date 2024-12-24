@@ -56,7 +56,7 @@
 # ls -ld /var/www/peertube # Should be drwxr-xr-x
 
 - name: Create Postgres DB User
-  ansible.builtin.command: "psql -c "CREATE USER peertube with password '{{ PEERTUBEDBPASS }}';"
+  ansible.builtin.command: psql -c "CREATE USER peertube with password "{{ PEERTUBEDBPASS }}";"
   become_user: postgres
   become: true
 
@@ -71,7 +71,7 @@
   become: true
 
 - name: Get PeerTube Version
-  ansible.builtin.command: 'VERSION=$(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4) && echo "Latest Peertube version is $VERSION"'
+  ansible.builtin.command: VERSION=$(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4) && echo "Latest Peertube version is $VERSION"
   become: true
 
 - name: Create dirs
@@ -154,7 +154,7 @@
   when: PUBLICCERT = "certbot"
 
 - name: Create selfsigned cert
-  ansible.builtin.command: "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/letsencrypt/live/{{ ansible_inventory }}/privkey.pem -out /etc/letsencrypt/live/{{ ansible_inventory }}/fullchain.pem -subj "/C=CH/ST=Zurich/L=Zurich/O=ENPCON/OU=CCC/CN={{ ansible_inventory }}"
+  ansible.builtin.command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/letsencrypt/live/{{ ansible_inventory }}/privkey.pem -out /etc/letsencrypt/live/{{ ansible_inventory }}/fullchain.pem -subj "/C=CH/ST=Zurich/L=Zurich/O=ENPCON/OU=CCC/CN={{ ansible_inventory }}"
   become: true
   when: PUBLICCERT = "selfsigned"
 
