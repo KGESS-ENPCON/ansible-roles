@@ -1,0 +1,6 @@
+---
+- name: Include PeerTube Server Tasks
+  ansible.builtin.include_tasks:
+    file: peertube.yml
+
+...

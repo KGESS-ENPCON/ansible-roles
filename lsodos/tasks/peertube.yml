@@ -189,7 +189,6 @@
     enabled: true
   become: true
 
-
 ### Install peertube-cli
 # node --version # Should be >= 16.x
 # sudo npm install -g @peertube/peertube-cli
@@ -197,4 +196,3 @@
 # peertube-cli upload <videoFile>
 
 ...
-  

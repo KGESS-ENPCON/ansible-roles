@@ -1,0 +1,7 @@
+---
+- hosts: elsodos
+  roles:
+    - debian-base
+    - lsodos
+
+...
