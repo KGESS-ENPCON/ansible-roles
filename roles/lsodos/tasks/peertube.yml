@@ -96,14 +96,14 @@
 
 - name: Get PeerTube
   ansible.builtin.command: wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/{{ PEERTUBEVER }}/peertube-{{ PEERTUBEVER }}.zip"
-  chdir: /var/www/peertube/versions/
+  chdir: /var/www/peertube/versions
   become_user: peertube
   become: true
 
 - name: Unzip PeerTube
   ansible.builtin.command: unzip -q peertube-{{ PEERTUBEVER }}.zip
   become_user: peertube
-  chdir: /var/www/peertube/versions/
+  chdir: /var/www/peertube/versions
   become: true
 
 - name: Create symlink
