@@ -134,7 +134,7 @@
   become: true
 
 - name: Copy nginx config II
-  ansible.builtin.command: sed -i 's/${WEBSERVER_HOST}/{{ ansible_inventory }}/g' /etc/nginx/sites-available/peertube
+  ansible.builtin.command: sed -i 's/${WEBSERVER_HOST}/{{ inventory_hostname }}/g' /etc/nginx/sites-available/peertube
   become: true
 
 - name: Copy nginx config III
@@ -157,7 +157,7 @@
   when: PUBLICCERT = "certbot"
 
 - name: Create selfsigned cert
-  ansible.builtin.command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/letsencrypt/live/{{ ansible_inventory }}/privkey.pem -out /etc/letsencrypt/live/{{ ansible_inventory }}/fullchain.pem -subj "/C=CH/ST=Zurich/L=Zurich/O=ENPCON/OU=CCC/CN={{ ansible_inventory }}"
+  ansible.builtin.command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/letsencrypt/live/{{ inventory_hostname }}/privkey.pem -out /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem -subj "/C=CH/ST=Zurich/L=Zurich/O=ENPCON/OU=CCC/CN={{ inventory_hostname }}"
   become: true
   when: PUBLICCERT = "selfsigned"
 
