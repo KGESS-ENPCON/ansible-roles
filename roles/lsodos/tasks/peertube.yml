@@ -96,14 +96,16 @@
 
 - name: Get PeerTube
   ansible.builtin.command: wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/{{ PEERTUBEVER }}/peertube-{{ PEERTUBEVER }}.zip"
-  chdir: /var/www/peertube/versions
+  args:
+    chdir: /var/www/peertube/versions
   become_user: peertube
   become: true
 
 - name: Unzip PeerTube
   ansible.builtin.command: unzip -q peertube-{{ PEERTUBEVER }}.zip
   become_user: peertube
-  chdir: /var/www/peertube/versions
+  args:
+    chdir: /var/www/peertube/versions
   become: true
 
 - name: Create symlink
@@ -113,7 +115,8 @@
 
 - name: Install via yarn
   ansible.builtin.command: sudo -H -u peertube yarn install --production --pure-lockfile
-  chdir: /var/www/peertube/peertube-latest
+  args:
+    chdir: /var/www/peertube/peertube-latest
   become: true
 
 - name: Copy PeerTube configfiles
