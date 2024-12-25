@@ -75,10 +75,6 @@
   become_user: postgres
   become: true
 
-- name: Get PeerTube Version
-  ansible.builtin.command: echo "Latest Peertube version is $(curl -s https://api.github.com/repos/chocobozzz/peertube/releases/latest | grep tag_name | cut -d '"' -f 4)"
-  become: true
-
 - name: Create dirs
   ansible.builtin.file:
     path: "{{ item.src }}"
@@ -99,22 +95,24 @@
   become_user: peertube
 
 - name: Get PeerTube
-  ansible.builtin.command: wget -q -P /var/www/peertube/versions/ "https://github.com/Chocobozzz/PeerTube/releases/download/${VERSION}/peertube-${VERSION}.zip"
+  ansible.builtin.command: wget -q -P /var/www/peertube/versions/ "https://github.com/Chocobozzz/PeerTube/releases/download/{{ PEERTUBEVER }}/peertube-{{ PEERTUBEVER }}.zip"
   become_user: peertube
   become: true
 
 - name: Unzip PeerTube
-  ansible.builtin.command: cd /var/www/peertube/versions && unzip -q peertube-${VERSION}.zip && rm peertube-${VERSION}.zip
+  ansible.builtin.command: unzip -q peertube-{{ PEERTUBEVER }}.zip
   become_user: peertube
+  chdir: /var/www/peertube/versions/
   become: true
 
 - name: Create symlink
-  ansible.builtin.command: cd /var/www/peertube && ln -s versions/peertube-${VERSION} ./peertube-latest
+  ansible.builtin.command: ln -s /var/www/peertube/versions/peertube-{{ PEERTUBEVER }} /var/www/peertube/peertube-latest
   become_user: peertube
   become: true
 
 - name: Install via yarn
-  ansible.builtin.command: cd /var/www/peertube/peertube-latest && sudo -H -u peertube yarn install --production --pure-lockfile
+  ansible.builtin.command: sudo -H -u peertube yarn install --production --pure-lockfile
+  chdir: /var/www/peertube/peertube-latest
   become: true
 
 - name: Copy PeerTube configfiles
