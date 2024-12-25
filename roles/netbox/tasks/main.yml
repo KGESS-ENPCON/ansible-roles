@@ -9,6 +9,3 @@
   ansible.builtin.apt:
     name: "postgresql"
     state: latest
-
-- name: 
-  
