@@ -66,7 +66,7 @@
   become: true
 
 - name: Edit DB parameters
-  ansible.builtin.command: psql -c "CREATE EXTENSION pg_trgm;" peertube_prod 
+  ansible.builtin.command: psql -c "CREATE EXTENSION pg_trgm;" peertube_prod
   become_user: postgres
   become: true
 
@@ -95,7 +95,8 @@
   become_user: peertube
 
 - name: Get PeerTube
-  ansible.builtin.command: wget -q -P /var/www/peertube/versions/ "https://github.com/Chocobozzz/PeerTube/releases/download/{{ PEERTUBEVER }}/peertube-{{ PEERTUBEVER }}.zip"
+  ansible.builtin.command: wget -q "https://github.com/Chocobozzz/PeerTube/releases/download/{{ PEERTUBEVER }}/peertube-{{ PEERTUBEVER }}.zip"
+  chdir: /var/www/peertube/versions/
   become_user: peertube
   become: true
 
