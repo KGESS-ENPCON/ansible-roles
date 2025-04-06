@@ -29,4 +29,15 @@
     path: /opt/peertube
     state: directory
 
-- name: 
+- name: Copy docker-compose.yml from templates
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/peertube/docker-compose.yml
+    mode: '0644'
+
+- name: Copy .env from templates
+  template:
+    src: templates/env.j2
+    dest: /opt/peertube/.env
+    mode: '0644'
+
