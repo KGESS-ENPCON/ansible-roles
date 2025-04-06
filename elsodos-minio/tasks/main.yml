@@ -1,0 +1,58 @@
+---
+- name: Prepare for Docker Install
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+
+- name: Add Docker GPG Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker APT Repo
+  apt_repository:
+    repo: deb [arch={{ ansible_facts.ansible_architecture }}] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+    state: present
+
+- name: Install Docker
+  apt:
+    name: docker-ce docker-compose-plugin docker-ce-cli containerd.io docker-buildx-plugin
+    state: present
+
+- name: Format Drive
+  command: parted {{ external-minio-drivepath }} mklabel gpt && parted -a optimal {{ external-minio-drivepath }} mkpart primary ext4 0% 100%
+
+- name: New FS
+  command: mkfs.ext4 {{ external-minio-drivepath }}1
+
+- name: Create dir for drive
+  file:
+    path: /mnt/s3-data
+    state: directory
+
+- name: Mount Drive
+  mount:
+    path: /mnt/s3-data
+    src: {{ external-minio-drivepath }}1
+    fstype: ext4
+    state: mounted
+
+- name: Run MinIO Server Docker Container
+  docker_container:
+    name: minio-server
+    image: xyz
+    state: started
+    restart_policy: always
+    published_ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - /mnt/s3-data:/data
+    env:
+      MINIO_ROOT_USER: {{ minio-cont-root-user }}
+      MINIO_ROOT_PASSWORD: {{ minio-cont-root-passwd }}
+    command: server /data --console-address ":9001"
