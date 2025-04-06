@@ -1,6 +1,0 @@
----
-- hosts: elsodos
-  roles:
-    - lsodos
-
-...

@@ -1,8 +1,0 @@
----
-PUBLICCERT: "selfsigned"
-PEERTUBEUSERPASS: ""
-PEERTUBEDBPASS: ""
-PEERTUBEOPSEC: "openssl rand -hex 32"
-LOCALS3: "present"
-
-PEERTUBEVER: "v7.0.0"
