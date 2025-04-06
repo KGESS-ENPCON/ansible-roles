@@ -6,6 +6,7 @@
       - ca-certificates
       - curl
       - software-properties-common
+      - awscli
     state: present
 
 - name: Add Docker GPG Key
@@ -44,7 +45,7 @@
 - name: Run MinIO Server Docker Container
   docker_container:
     name: minio-server
-    image: xyz
+    image: quay.io/minio/minio
     state: started
     restart_policy: always
     published_ports:
@@ -55,4 +56,23 @@
     env:
       MINIO_ROOT_USER: {{ minio-cont-root-user }}
       MINIO_ROOT_PASSWORD: {{ minio-cont-root-passwd }}
+      MINIO_DOMAIN: {{ minio-cont-server-fqdn }}
     command: server /data --console-address ":9001"
+
+- name: Wait for MinIO to start
+  wait_for:
+    port: 9000
+    delay: 10
+    timeout: 60
+
+- name: Configure AWSCLI for MinIO I
+  command: aws configure set aws_access_key_id {{ minio-cont-root-user }}
+
+- name: Configure AWSCLI for MinIO II
+  command: aws configure set aws_secret_access_key {{ minio-cont-root-passwd }}
+
+- name: Configure AWSCLI for MinIO III
+  command: aws configure set default.s3.enpoint_url http://localhost:9000
+
+- name: Create MinIO Bucket
+  command: aws s3 mb s3://{{ minio-cont-bucket-name }}

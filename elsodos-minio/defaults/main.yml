@@ -1,1 +1,5 @@
-minio-server-fqdn: "minio.internal"
+minio-cont-server-fqdn: "minio.internal"
+external-minio-drivepath: "/dev/sda"
+minio-cont-root-user: "minio-admin"
+minio-cont-root-passwd: ""
+minio-cont-bucket-name: "bucket0001"
