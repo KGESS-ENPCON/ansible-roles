@@ -1,0 +1,3 @@
+peertube-server-fqdn: "peertube.internal"
+minio-cont-server-fqdn: "minio.internal"
+minio-cont-bucket-name: "bucket0001"
